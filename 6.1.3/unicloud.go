@@ -30,6 +30,8 @@ type Context struct {
 	Address  string
 }
 
+// password is in /etc/cfm/.cfmsecret user is cfm
+
 func NewContext(user, password, address string) Context {
 	var ctx Context
 	ctx.User = user
