@@ -19,7 +19,7 @@ mkdir -p $OUTPUTDIR/arm64
 GOOS=darwin GOARCH=amd64 go build -o $OUTPUTDIR/darwin64/$FILE $GOFILE
 GOOS=linux GOARCH=amd64 go build -o $OUTPUTDIR/lx-amd64/$FILE $GOFILE
 GOOS=linux GOARCH=arm go build -o $OUTPUTDIR/arm6/$FILE $GOFILE
-GOOS=windows GOARCH=386 go build -o $OUTPUTDIR/win32/$FILE $GOFILE
+GOOS=windows GOARCH=386 go build -o $OUTPUTDIR/win32/$FILE.exe $GOFILE
 # Go 1.5 required for arm64 (ARM8)
 GOOS=linux GOARCH=arm64 go build -o $OUTPUTDIR/arm64/$FILE $GOFILE
 
