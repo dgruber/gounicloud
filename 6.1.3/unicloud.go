@@ -1,5 +1,5 @@
 /*
-Copyright 2015 Daniel Gruber, Univa
+   Copyright 2015 Daniel Gruber, Univa
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -56,8 +57,29 @@ type AddNodeResult struct {
 	AddHostSession string `json:"addHostSession"`
 }
 
-// AddNode adds a new UniCloud nodes to the cluster by the given hardware and software
-// profiles.
+func (ctx Context) ucGetDelete(request, url string) ([]byte, error) {
+	// we trust the signature
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
+	req, errRequest := http.NewRequest(request, url, nil)
+	if errRequest != nil {
+		return nil, errRequest
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.SetBasicAuth(ctx.User, ctx.Password)
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	return ioutil.ReadAll(resp.Body)
+}
+
+// AddNode adds a new UniCloud nodes to the cluster by the given hardware
+// and software profiles.
 func (ctx Context) AddNode(count int, hardwareprofile, softwareprofile string) (AddNodeResult, error) {
 	var result AddNodeResult
 
@@ -103,89 +125,54 @@ type DeleteResult struct {
 // DeleteNode deletes a UniCloud node by name
 func (ctx Context) DeleteNode(name string) (DeleteResult, error) {
 	var result DeleteResult
-
-	// we trust the signature
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
-
 	url := fmt.Sprintf("https://%s:8443/v1/nodes/%s/True", ctx.Address, name)
-	req, errRequest := http.NewRequest("DELETE", url, nil)
-	if errRequest != nil {
-		return result, errRequest
+	data, err := ctx.ucGetDelete("DELETE", url)
+	if err == nil {
+		err = json.Unmarshal(data, &result)
 	}
-	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(ctx.User, ctx.Password)
-	resp, err := client.Do(req)
-	if err != nil {
-		return result, err
-	}
-	defer resp.Body.Close()
-
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&result); err != nil {
-		return result, err
-	}
-	return result, nil
+	return result, err
 }
 
 // GetNode returns the details of a specific UniCloud node.
 func (ctx Context) GetNode(name string) (UniCloudNode, error) {
-	var node UniCloudNode
-
-	// we trust the signature
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
-
+	var result UniCloudNode
 	url := fmt.Sprintf("https://%s:8443/v1/nodes/%s", ctx.Address, name)
-	req, errRequest := http.NewRequest("GET", url, nil)
-	if errRequest != nil {
-		return node, errRequest
+	data, err := ctx.ucGetDelete("GET", url)
+	if err == nil {
+		err = json.Unmarshal(data, &result)
 	}
-	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(ctx.User, ctx.Password)
-	resp, err := client.Do(req)
-	if err != nil {
-		return node, err
-	}
-	defer resp.Body.Close()
-
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&node); err != nil {
-		return node, err
-	}
-	return node, nil
+	return result, err
 }
 
 // GetAllNodes returns all UniCloud nodes available.
 func (ctx Context) GetAllNodes() (UniCloudNodes, error) {
-	var nodes UniCloudNodes
-
-	// we trust the signature
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
-
+	var result UniCloudNodes
 	url := fmt.Sprintf("https://%s:8443/v1/nodes", ctx.Address)
-	req, errRequest := http.NewRequest("GET", url, nil)
-	if errRequest != nil {
-		return nodes, errRequest
+	data, err := ctx.ucGetDelete("GET", url)
+	if err == nil {
+		err = json.Unmarshal(data, &result)
 	}
-	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(ctx.User, ctx.Password)
-	resp, err := client.Do(req)
-	if err != nil {
-		return nodes, err
-	}
-	defer resp.Body.Close()
+	return result, err
+}
 
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&nodes); err != nil {
-		return nodes, err
+// GetHardwareProfiles returns all hardware profiles registered at the installer.
+func (ctx Context) GetHardwareProfiles() (HardwareProfiles, error) {
+	var result HardwareProfiles
+	url := fmt.Sprintf("https://%s:8443/v1/hardwareProfiles", ctx.Address)
+	data, err := ctx.ucGetDelete("GET", url)
+	if err == nil {
+		err = json.Unmarshal(data, &result)
 	}
-	return nodes, nil
+	return result, err
+}
+
+// GetSoftwareProfiles returns all software profiles registered at the installer.
+func (ctx Context) GetSoftwareProfiles() (SoftwareProfiles, error) {
+	var result SoftwareProfiles
+	url := fmt.Sprintf("https://%s:8443/v1/softwareProfiles", ctx.Address)
+	data, err := ctx.ucGetDelete("GET", url)
+	if err == nil {
+		err = json.Unmarshal(data, &result)
+	}
+	return result, err
 }
