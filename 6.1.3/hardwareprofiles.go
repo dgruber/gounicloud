@@ -18,6 +18,7 @@ package unicloud
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 )
 
@@ -90,6 +91,14 @@ type HardwareProfiles struct {
 }
 
 func (hp HardwareProfiles) PrintXML() error {
+	doc, err := xml.Marshal(hp)
+	if err == nil {
+		fmt.Println(string(doc))
+	}
+	return err
+}
+
+func (hp HardwareProfiles) PrintJSON() error {
 	doc, err := json.Marshal(hp)
 	if err == nil {
 		fmt.Println(string(doc))

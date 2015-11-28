@@ -18,6 +18,7 @@ package unicloud
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 )
 
@@ -104,6 +105,14 @@ type SoftwareProfiles struct {
 }
 
 func (sp SoftwareProfiles) PrintXML() error {
+	doc, err := xml.Marshal(sp)
+	if err == nil {
+		fmt.Println(string(doc))
+	}
+	return err
+}
+
+func (sp SoftwareProfiles) PrintJSON() error {
 	doc, err := json.Marshal(sp)
 	if err == nil {
 		fmt.Println(string(doc))
