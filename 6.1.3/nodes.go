@@ -18,6 +18,7 @@ package unicloud
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 )
 
@@ -194,8 +195,16 @@ type UniCloudNodes struct {
 	} `json:"nodes"`
 }
 
-func (ucn UniCloudNodes) PrintXML() error {
+func (ucn UniCloudNodes) PrintJSON() error {
 	doc, err := json.Marshal(ucn)
+	if err == nil {
+		fmt.Println(string(doc))
+	}
+	return err
+}
+
+func (ucn UniCloudNodes) PrintXML() error {
+	doc, err := xml.Marshal(ucn)
 	if err == nil {
 		fmt.Println(string(doc))
 	}
