@@ -1,5 +1,5 @@
 /*
-Copyright 2015 Daniel Gruber, Univa
+   Copyright 2015 Daniel Gruber, Univa
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -38,14 +38,13 @@ func main() {
 
 	// password and hostaddress as arguments
 	ctx := unicloud.NewContext("cfm", os.Args[1], os.Args[2])
-	fmt.Printf("%v\n", ctx)
 
 	// adding 2 new nodes with hardware profile EC2 and software profile Compute
 	if result, err := ctx.AddNode(amount, os.Args[4], os.Args[5]); err != nil {
-		fmt.Printf("Error when adding 2 additional nodes: %s\n", err)
+		fmt.Printf("Error when adding %d additional nodes: %s\n", amount, err)
 		os.Exit(1)
 	} else {
-		fmt.Println("Successfully added two nodes.")
+		fmt.Printf("Successfully added %d nodes.\n", amount)
 		fmt.Printf("Add Host Session: %s\n", result.AddHostSession)
 	}
 }
