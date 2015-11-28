@@ -2,7 +2,7 @@
 
 Simple Go API wrapper for the UniCloud REST API.
 
-[UniCloud](http://www.univa.com/unicloud) is a product of [Univa](http://www.univa.com) which can
+[UniCloud](http://www.univa.com/products) is a product of [Univa](http://www.univa.com) which can
 provision (not just) Grid Engine to bare matel or cloud instances (like Amazon EC2).
 
 # Examples
