@@ -1,4 +1,6 @@
 # gounicloud
+[![GoDoc](http://img.shields.io/badge/godoc-reference-blue.svg)](http://godoc.org/github.com/dgruber/gounicloud)
+[![Go Report Card](http://goreportcard.com/badge/dgruber/gounicloud)](http://goreportcard.com/report/dgruber/gounicloud)
 
 Simple Go API wrapper for the UniCloud REST API.
 
